@@ -1,0 +1,149 @@
+﻿@model IEnumerable<SecurityDepartment.Models.AccountingInstruction>
+
+@{
+    ViewData["Title"] = "Журнал учёта проведённых инструктажей - главная";
+}
+
+<h5>Журнал учёта проведённых инструктажей</h5>
+<p>
+    <a asp-action="Create">Добавить запись</a>
+</p>
+
+<style>
+    div.block {
+        display: inline-block;
+        padding: 5px;
+        margin: 5px;
+    }
+        div.block:hover {
+            margin: 5px;
+            padding: 5px;
+        }      
+
+    div.second {
+        margin: 15px;
+        padding: 15px;
+    }
+</style>
+
+<div class="block">
+    <form asp-action="Index" method="post">
+        <div class="form-actions no-color">
+            <p>
+                Поиск по таблице:
+                <input type="text" name="searchString" value="@ViewData["CurrentFilter"]" />
+                <input type="submit" value="Найти" class="btn btn-primary" />
+            </p>
+        </div>
+    </form>
+</div>
+
+<div class="block">
+    <a href="@Url.Action("Index")">
+        <button class="btn btn-primary">Показать таблицу</button>
+    </a>
+
+    <a href="@Url.Action("Index", "AccountingInstructions", new {parametr = "AddTable"})">
+        <button class="btn btn-primary">Показать связанные таблицы</button>
+    </a>
+
+    <a href="@Url.Action("Report", "AccountingInstructions")">
+        <button class="btn btn-primary">Сформировать отчёт</button>
+    </a>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["DateKey"]">Дата проведения</a>
+            </th>
+            <th>
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["ObjectKey"]">№ объекта</a>               
+            </th>
+            <th>
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["ExecutorKey"]">Исполнитель</a>               
+            </th>
+            <th>
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["ListenerKey"]">Слушатель</a>
+            </th>
+            <th>
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["LessKey"]">Тип инструктажа</a>
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.Raw(item.Date.ToString("dd-MM-yyyy"))
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ObjectId)
+                </td>
+                <td>
+                    [@Html.DisplayFor(modelItem => item.ExecutorId)],
+                    @Html.DisplayFor(modelItem => item.WorkerCards.SecondName)
+                    @Html.DisplayFor(modelItem => item.WorkerCards.FirstName)
+                </td>
+                <td>
+                    [@Html.DisplayFor(modelItem => item.ListenerId)],
+                    @Html.DisplayFor(modelItem => item.Clients.LastName)
+                    @Html.DisplayFor(modelItem => item.Clients.FirstName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Instruction.Name)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.RegNumber">Редактировать</a> |
+                    <a asp-action="Details" asp-route-id="@item.RegNumber">Подробно</a> |
+                    <a asp-action="Delete" asp-route-id="@item.RegNumber">Удалить</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@{
+    List<Instruction> InstructionModel = (List<Instruction>)ViewBag.InstructionModel;
+
+}
+<br />
+@if (InstructionModel != null)
+{
+    <h5>Виды проводимых инструктажей:</h5>
+    <a href="@Url.Action("Index", "Instructions")">Перейти к таблице</a>
+    <table class="table" id="second">
+        <thead>
+            <tr>
+                <th>
+                    УИД
+                </th>
+                <th>
+                    Название инструктажа
+                </th>
+                <th>
+                    Длительность, мин.
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in InstructionModel)
+            {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Id)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Duration)
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+}
